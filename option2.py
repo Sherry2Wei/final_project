@@ -5,15 +5,20 @@ import time
 
 ##browser = webdriver.Chrome(r'D:\01software\chromedriver\chromedriver')
 browser = webdriver.Firefox(executable_path=r'D:\01software\chromedriver\geckodriver')
-firm_list = ['BOFA SECURITIES, INC.','BARCLAY INVESTMENTS LLC','BARCLAYS CAPITAL INC.'
-,'JPMORGAN DISTRIBUTION SERVICES, INC.','GOLDMAN SACHS & CO. LLC'
-,'MORGAN STANLEY & CO. LLC','CITIGROUP GLOBAL MARKETS INC.'
-,'CREDIT SUISSE SECURITIES (USA) LLC','CREDIT SUISSE PRIME SECURITIES SERVICES (USA) LLC'
-,'CREDIT SUISSE SECURITIES (USA) LLC','CREDITEX SECURITIES CORPORATION']
+
+browser.get('https://www.finra.org/about/firms-we-regulate')
+browser.find_element_by_xpath('//div/article//div').text
+link = [term.text for term in browser.find_elements_by_xpath('//div/article//div/span/a')][2:]
+
+firm_list_combine = [term.text.split(',')[0] for term in browser.find_elements_by_xpath('//div/article//div/p')]
+
+for letter in link:
+    time.sleep(1)
+    browser.find_element_by_link_text(letter).click()
+    firm_list = [term.text.split(',')[0] for term in browser.find_elements_by_xpath('//div/article//div/p')]
+    firm_list_combine.extend(firm_list)
 
 
-## for firm in firm_list:
-firm = 'BOFA SECURITIES, INC.'
 def download_misconduct(firm):
     browser.get('https://brokercheck.finra.org/')
     browser.find_element_by_xpath('//md-tabs-wrapper/md-tabs-canvas/md-pagination-wrapper/md-tab-item[3]/div[1]').click()
@@ -27,9 +32,9 @@ def download_misconduct(firm):
     browser.get(firm_url)
     browser.find_element_by_id('download').click()
 
-download_misconduct(firm)
 
-for firm in firm_list:
+
+for firm in firm_list_combine:
     time.sleep(1)
     try:
         download_misconduct(firm)
